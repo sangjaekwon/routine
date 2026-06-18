@@ -15,6 +15,7 @@ export default function SignupForm() {
     contact: '',
     job: '',
     shift: '',
+    feedback: '',
     agree: false,
   })
   const [error, setError] = useState('')
@@ -46,6 +47,7 @@ export default function SignupForm() {
         contact: form.contact.trim(),
         job: form.job,
         shift: form.shift,
+        feedback: form.feedback.trim() || null,
         agree: form.agree,
       })
       if (insertError) throw insertError
@@ -181,6 +183,20 @@ export default function SignupForm() {
                       <Chevron />
                     </div>
                   </div>
+                </div>
+
+                <div>
+                  <label htmlFor="feedback" className="field-label">
+                    서비스 의견 <span className="font-normal text-ink-400">(선택)</span>
+                  </label>
+                  <textarea
+                    id="feedback"
+                    rows={3}
+                    value={form.feedback}
+                    onChange={update('feedback')}
+                    placeholder="이런 기능이 있으면 좋겠어요, 같은 의견을 자유롭게 남겨주세요."
+                    className="field-input resize-none"
+                  />
                 </div>
 
                 <label className="flex cursor-pointer items-start gap-2.5 pt-1">

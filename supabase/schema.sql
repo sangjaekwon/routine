@@ -8,9 +8,13 @@ create table if not exists public.signups (
   contact    text        not null,
   job        text        not null,
   shift      text        not null,
+  feedback   text,
   agree      boolean     not null default false,
   created_at timestamptz not null default now()
 );
+
+-- 1-1) 기존 테이블에 feedback 컬럼 보강 (선택 입력이므로 nullable)
+alter table public.signups add column if not exists feedback text;
 
 -- 2) RLS 활성화 (공개 폼이므로 행 단위 보안 필수)
 alter table public.signups enable row level security;
