@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-[#F6F8FC] text-ink-900 font-sans antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* iOS Safari에서 입력 폼 확대 방지 + 일관된 폰트 */
+  input,
+  select,
+  textarea,
+  button {
+    font-family: inherit;
+  }
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
+  /* 진한 파란색 기본 버튼 */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-600
+      px-6 py-3 text-sm font-semibold text-white shadow-btn transition-all duration-200
+      hover:bg-brand-700 hover:shadow-float active:scale-[0.98]
+      focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-200;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-slate-200
+      bg-white px-5 py-2.5 text-sm font-semibold text-ink-700 transition-all duration-200
+      hover:border-brand-200 hover:text-brand-700 hover:shadow-soft;
+  }
+
+  .field-label {
+    @apply mb-1.5 block text-sm font-medium text-ink-700;
+  }
+
+  .field-input {
+    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-ink-900
+      placeholder:text-ink-400 transition-all duration-200
+      focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-100;
+  }
+
+  /* 스크롤 리빌: 뷰포트 진입 시 .is-visible 토글로 페이드업 */
+  .reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
