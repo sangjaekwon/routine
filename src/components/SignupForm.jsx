@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Reveal from './Reveal.jsx'
+import { supabase, isSupabaseConfigured } from '../lib/supabase.js'
 
 const JOB_OPTIONS = ['간호사', '경찰', '소방관', '군인', '생산직', '보안직', '기타']
 const SHIFT_OPTIONS = ['3교대', '2교대', '야간 고정', '불규칙 근무', '기타']
@@ -18,6 +19,7 @@ export default function SignupForm() {
   })
   const [error, setError] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const update = (key) => (e) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value
@@ -25,7 +27,7 @@ export default function SignupForm() {
     if (error) setError('')
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
     if (!form.contact.trim()) return setError('연락처를 입력해 주세요.')
@@ -33,8 +35,28 @@ export default function SignupForm() {
     if (!form.shift) return setError('근무 형태를 선택해 주세요.')
     if (!form.agree) return setError('개인정보 수집 및 이용에 동의해 주세요.')
 
-    // 실제 제출 연동은 추후. 지금은 성공 상태로 전환.
-    setSubmitted(true)
+    setSubmitting(true)
+    setError('')
+    try {
+      if (!isSupabaseConfigured) {
+        throw new Error('Supabase 환경변수가 설정되지 않았습니다.')
+      }
+
+      const { error: insertError } = await supabase.from('signups').insert({
+        contact: form.contact.trim(),
+        job: form.job,
+        shift: form.shift,
+        agree: form.agree,
+      })
+      if (insertError) throw insertError
+
+      setSubmitted(true)
+    } catch (err) {
+      console.error('[signup] 제출 실패:', err)
+      setError('신청 중 문제가 발생했어요. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
@@ -88,16 +110,6 @@ export default function SignupForm() {
                   <br />
                   교대핏과 함께 더 가벼운 수면을 준비해요.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setForm({ contact: '', job: '', shift: '', agree: false })
-                    setSubmitted(false)
-                  }}
-                  className="btn-ghost mt-6"
-                >
-                  다시 신청하기
-                </button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="space-y-4">
@@ -191,8 +203,12 @@ export default function SignupForm() {
                   </p>
                 )}
 
-                <button type="submit" className="btn-primary w-full !py-3.5 text-[15px]">
-                  출시 알림 신청하기
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="btn-primary w-full !py-3.5 text-[15px] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {submitting ? '신청 중…' : '출시 알림 신청하기'}
                 </button>
               </form>
             )}
